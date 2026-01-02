@@ -8,7 +8,9 @@ session_start();
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PHP App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -21,7 +23,7 @@ $isAdminLoggedIn =
     && $_SESSION['user']['role'] === "admin";
 
 if ($isAdminLoggedIn) {
-
+ 
     if (!isset($_SESSION['admin_csrf'])) {
         $_SESSION['admin_csrf'] = bin2hex(random_bytes(32));
     }
@@ -36,10 +38,11 @@ if ($isAdminLoggedIn) {
 
     if ($conn->connect_error) {
         $html = "<h1>Database connection failed</h1>";
+        exit;
     } else {
 
         $result = $conn->query(
-            "SELECT user_id, attended_at, check_in_time, device_info FROM attendance"
+            "SELECT username,users_id, attended_at, check_in_time, device_info,ip FROM attendance"
         );
 
         if ($result && $result->num_rows > 0) {
@@ -48,27 +51,37 @@ if ($isAdminLoggedIn) {
 
             while ($row = $result->fetch_assoc()) {
                 $attendances .= '
-                <tr>
-                    <td>' . $row['user_id'] . '</td>
+                <tr class="'.<?php echo 's'>.'">
+                    <td>' . $row['username'] . '</td>
+                    <td>' . $row['users_id'] . '</td>
                     <td>' . $row['attended_at'] . '</td>
                     <td>' . $row['check_in_time'] . '</td>
                     <td>' . $row['device_info'] . '</td>
+                    <td>' . $row['ip'] . '</td>
                 </tr>';
             }
 
-            $html = '
-            <form>
-            
-            </form>
-            <table class="border w-full mt-4 text-center">
-                <tr class="bg-gray-200">
-                    <th>User ID</th>
-                    <th>Attended At</th>
-                    <th>Check In Time</th>
-                    <th>Device Info</th>
-                </tr>
-                ' . $attendances . '
-            </table>';
+$html = '
+<table id="usersTable" class="table table-striped table-bordered">
+  <thead>
+    <tr>
+     <th>Username</th>
+      <th>User ID</th>
+      <th>Attended At</th>
+      <th>Check In Time</th>
+      <th>Device Info</th>
+      <th>IP Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    '.$attendances.'
+  </tbody>
+</table>';
+
+
+
+
+
 
         } else {
             $html = '<h1>0 Results</h1>';
@@ -76,11 +89,33 @@ if ($isAdminLoggedIn) {
     }
 }
 else{
-  $html ='<h1>Please Login as Admin</h1>';
+  header("Location: /login");
+exit;
+
 }
 include "../container.php";
 ?>
 
 <script src="/js/main.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#usersTable').DataTable({
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
+      ordering: true,
+      searching: true,
+      responsive: true
+    });
+  });
+</script>
+
 </body>
 </html>

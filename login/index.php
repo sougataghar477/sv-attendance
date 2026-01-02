@@ -7,7 +7,8 @@ session_start();
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PHP App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -19,20 +20,40 @@ session_start();
   $_SESSION['login_csrf'] = $csrf;
 // Load our environment variables from the .env file:
     
-     $html='<form class="w-80  shadow-2xl rounded-2xl p-4" onsubmit="handleLogin(event)">
-     <div>
-     <label  for="email">Email</label>
-     <input class="block w-full border-2 p-2 rounded-xl mt-2 mb-4" id="email" name="email" type="email"/>
-     </div>
-     <div>
-     <label  for="password">Password</label>
-     <input class="block w-full border-2 p-2 rounded-xl mt-2 mb-4" id="password" name="password" type="password"/>
-     <input type="hidden" name="login_csrf" value="'.$csrf.'"/>
-     </div>
-     <button class="w-full p-2 border-2 rounded-xl bg-black text-white">Login</button>
-     </form>';
+     $html='<form class="col-md-6 col-lg-4 mt-4 mx-auto shadow-lg rounded-4 p-4" onsubmit="handleLogin(event)">
+  
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      name="email"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="password" class="form-label">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="password"
+      name="password"
+      required
+    />
+    <input type="hidden" name="login_csrf" value="<?php echo $csrf; ?>" />
+  </div>
+
+  <button type="submit" class="btn btn-dark w-100">
+    Login
+  </button>
+
+</form>
+';
      include "../container.php";
   ?>
 <script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
