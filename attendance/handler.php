@@ -17,11 +17,12 @@ $isCsrfValid =
     exit;
     };
     $userId = intval($_SESSION['user']['id']);
-     
+    $userName = $_SESSION['user']['name'];
+    $ip = $_SERVER['REMOTE_ADDR']; 
     $deviceInfo = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
     $attendanceDay = date("Y-m-d");
-    $checkinTime = date("Y-m-d H:i:s");
- 
+    $checkinTime = date("H:i:s");
+    $createdAt = date("Y-m-d H:i:s", $_SERVER['REQUEST_TIME']);
 $conn = new mysqli(
     "db.fr-pari1.bengt.wasmernet.com",
     "a890400970b4800092c62a05eeea",
@@ -37,7 +38,7 @@ $conn = new mysqli(
     }
 
     $stmt = $conn->prepare(
-        "SELECT user_id FROM attendance WHERE user_id = ? AND attended_at = ?"
+        "SELECT users_id FROM attendance WHERE users_id = ? AND attended_at = ?"
     );
     $stmt->bind_param("is", $userId, $attendanceDay);
     $stmt->execute();
@@ -45,6 +46,7 @@ $conn = new mysqli(
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
+         $_SESSION['user']['attendance'] = true;
         echo json_encode([
             "status" => "failure",
             "message" => "Attendance Marked Already"
@@ -54,17 +56,17 @@ $conn = new mysqli(
     } else {
         $stmt = $conn->prepare(
         "INSERT INTO attendance 
-        (user_id, attended_at, check_in_time, device_info)
-        VALUES (?, ?, ?, ?)"
+        (users_id,username, attended_at, check_in_time,created_at, device_info,ip)
+        VALUES (?, ?, ?, ?, ?, ?, ?)"
     );
-        $stmt->bind_param("isss", $userId, $attendanceDay,$checkinTime,$deviceInfo);
+        $stmt->bind_param("issssss", $userId,$userName, $attendanceDay,$checkinTime,$createdAt,$deviceInfo,$ip);
         if($stmt->execute()){
+            $_SESSION['user']['attendance'] = true;
+            unset($_SESSION['attendance_csrf']);
             echo json_encode([
                 "status" => "success",
                 "message" => "Attendance Marked Successfully"
             ]);
-            $_SESSION['user']['attendance'] = true;
-             unset($_SESSION['attendance_csrf']);
             exit;
 
         }

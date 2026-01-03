@@ -42,7 +42,7 @@ if ($isAdminLoggedIn) {
     } else {
 
         $result = $conn->query(
-            "SELECT username,users_id, attended_at, check_in_time, device_info,ip FROM attendance"
+            "SELECT username,users_id, attended_at, check_in_time,created_at, device_info,ip FROM attendance"
         );
 
         if ($result && $result->num_rows > 0) {
@@ -50,7 +50,7 @@ if ($isAdminLoggedIn) {
             $attendances = '';
 
             while ($row = $result->fetch_assoc()) {
-    $errorClass = ($row['attended_at'] > date('Y-m-d H:i:s')) ? 'text-danger' : '';
+    $errorClass = (strtotime($row['attended_at'].' '.$row['check_in_time']) !== strtotime($row['created_at'])) ? 'text-danger' : '';
 
     $attendances .= '
     <tr >
@@ -58,12 +58,13 @@ if ($isAdminLoggedIn) {
         <td class="' . $errorClass . '">' . htmlspecialchars($row['users_id']) . '</td>
         <td class="' . $errorClass . '">' . htmlspecialchars($row['attended_at']) . '</td>
         <td class="' . $errorClass . '">' . htmlspecialchars($row['check_in_time']) . '</td>
+        <td class="' . $errorClass . '">' . htmlspecialchars($row['created_at']) . '</td>
         <td class="' . $errorClass . '">' . htmlspecialchars($row['device_info']) . '</td>
         <td class="' . $errorClass . '">' . htmlspecialchars($row['ip']) . '</td>
+        
     </tr>';
 }
-
-
+ 
 $html = '
 <table id="usersTable" class="table table-striped table-bordered">
   <thead>
@@ -72,6 +73,7 @@ $html = '
       <th>User ID</th>
       <th>Attended At</th>
       <th>Check In Time</th>
+      <th>Created At</th>
       <th>Device Info</th>
       <th>IP Address</th>
     </tr>
@@ -79,7 +81,9 @@ $html = '
   <tbody>
     '.$attendances.'
   </tbody>
-</table>';
+</table>
+ 
+';
 
 
 
@@ -92,7 +96,12 @@ $html = '
     }
 }
 else{
-  header("Location: /login");
+  if($_SESSION['user']['role']==="user"){
+    header("Location: /attendance");
+  }
+  else{
+      header("Location: /login");
+  }  
 exit;
 
 }

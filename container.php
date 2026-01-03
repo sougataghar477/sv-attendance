@@ -1,9 +1,11 @@
 <?php
+$isLoggedIn = isset($_SESSION['user']);
+$isAdminLoggedIn = isset($_SESSION['user']['role'])&& $_SESSION['user']['role']==="admin";
 $html;
 echo '
 
 <div class="container">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light my-4">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,31 +17,19 @@ echo '
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
+          <a class="nav-link" href="/attendance">Attendance</a>
+        </li>'.($isAdminLoggedIn?'
         <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
+          <a class="nav-link" href="/admin" tabindex="-1">Admin</a>
+        </li>':'').'
+      </ul>'.($isLoggedIn?'
       <form class="d-flex" action="/logout.php">
          
         <button class="btn btn-danger" type="submit">Log Out</button>
-      </form>
+      </form>':'').'
     </div>
   </div>
 </nav>
-
 '
 .$html.
 '</div>'

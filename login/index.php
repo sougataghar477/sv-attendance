@@ -49,8 +49,7 @@ session_start();
     Login
   </button>
 
-</form>
-';
+</form>';
      include "../container.php";
   ?>
 <script src="/js/main.js"></script>
